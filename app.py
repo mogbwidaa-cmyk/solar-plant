@@ -1,66 +1,93 @@
 import streamlit as st
 import numpy as np
-import pandas as pd
 import plotly.graph_objects as go
 import requests
-from datetime import datetime, timedelta
+from datetime import datetime
 
-# --- الثوابت (لا تتغير) ---
+# --- 1. الثوابت الراسخة (لا تتغير) ---
+st.set_page_config(page_title="منصة مراقبة المصانع والمعدات الميكانيكية", page_icon="🛡️", layout="wide")
+
 MY_PHONE = "+966501318054"
+LINKEDIN_URL = "https://www.linkedin.com/in/mogahed-bashir-52a5072ba/"
 PLATFORM_NAME = "منصة مراقبة المصانع والمعدات الميكانيكية"
+TELEGRAM_TOKEN = "8050369942:AAEN-n0Qn-kAmu_9k-lqZ9Fe-tsAOSd44OA"
+CHAT_ID = "6241195886"
 
-# --- محاكاة Industry 4.0 (البيانات الضخمة) ---
-def get_sensor_stream():
-    """محاكاة تدفق بيانات من حساسات حقيقية IIoT"""
-    return np.random.normal(3.5, 0.2, 24) # 24 قراءة خلال اليوم
+# --- 2. واجهة Industry 4.0 المتقدمة ---
+st.markdown(f"""
+    <style>
+    .main-box {{ background-color: #f8fafc; padding: 20px; border-radius: 15px; border-right: 10px solid #1e3a8a; }}
+    .stButton>button {{ background-color: #1e3a8a; color: white; border-radius: 8px; width: 100%; font-weight: bold; }}
+    </style>
+    <div class="main-box">
+        <h1 style='color: #1e3a8a; text-align: right;'>🛡️ {PLATFORM_NAME}</h1>
+        <p style='color: #475569; text-align: right; font-size: 18px;'>النظام السيبراني الموحد لأتمتة الأصول والطاقة المستدامة</p>
+    </div>
+    """, unsafe_allow_html=True)
 
-# --- الواجهة ---
-st.title(f"🚀 {PLATFORM_NAME} (Ver 4.0)")
-
-# قسم التوأم الرقمي للمحطة الشمسية
-st.header("☀️ التوأم الرقمي للمحطة الشمسية (Digital Twin)")
-
-
-col1, col2 = st.columns([2, 1])
-
-with col1:
-    # رسم بياني حي يوضح الفرق بين "الإنتاج المتوقع" و "الإنتاج الفعلي"
-    times = [(datetime.now() - timedelta(hours=i)).strftime("%H:%00") for i in range(24)][::-1]
-    expected = [200 * np.sin(np.pi * i / 12) if 6 <= i <= 18 else 0 for i in range(24)]
-    actual = [val * 0.85 for val in expected] # محاكاة خسائر حقيقية (غبار/حرارة)
+# --- 3. القائمة الجانبية (الهوية المهنية) ---
+with st.sidebar:
+    st.markdown(f"### م. مجاهد بشير")
+    st.info("🎓 باحث دراسات عليا - طاقة متجددة")
+    st.write("---")
+    st.markdown(f"📱 تواصل مباشر: `{MY_PHONE}`")
     
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=times, y=expected, name="الإنتاج المستهدف (Target)", line=dict(dash='dash', color='gray')))
-    fig.add_trace(go.Scatter(x=times, y=actual, name="الإنتاج الفعلي (IIoT Stream)", line=dict(color='#10b981', width=3)))
-    fig.update_layout(title="مقارنة الأداء اللحظي عبر إنترنت الأشياء", height=400, template="plotly_white")
-    st.plotly_chart(fig, use_container_width=True)
+    # الثوابت: أزرار التواصل
+    c1, c2 = st.columns(2)
+    with c1: st.markdown(f"[![WhatsApp](https://img.shields.io/badge/WhatsApp-25D366?style=for-the-badge&logo=whatsapp&logoColor=white)](https://wa.me/{MY_PHONE.replace('+', '')})")
+    with c2: st.markdown(f"[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)]({LINKEDIN_URL})")
+    
+    st.write("---")
+    menu = st.radio("انتقل إلى:", ["🚀 التوأم الرقمي (Digital Twin)", "🛠️ الصيانة التنبؤية (AI)", "🤖 وكيل الأتمتة والتوظيف"])
 
-with col2:
-    st.markdown("### 🤖 تشخيص الذكاء الاصطناعي")
-    efficiency_gap = 15 # فجوة الأداء
-    if efficiency_gap > 10:
-        st.error(f"⚠️ انحراف في الأداء بنسبة {efficiency_gap}%")
-        st.info("💡 التشخيص التلقائي: تراكم غبار كثيف + ارتفاع حرارة الخلايا.")
-        if st.button("تفعيل نظام التنظيف الآلي"):
-            st.success("تم إرسال أمر التشغيل لروبوتات التنظيف.")
+# --- 4. تطبيق مفاهيم Industry 4.0 ---
 
-# قسم الصيانة الاستباقية (Predictive Maintenance)
-st.divider()
-st.header("🛠️ الصيانة التنبؤية (AI-Predict)")
+if menu == "🚀 التوأم الرقمي (Digital Twin)":
+    st.subheader("☀️ محاكاة المحطة الشمسية عبر إنترنت الأشياء (IIoT)")
+    
+    
+    col_input, col_chart = st.columns([1, 2])
+    with col_input:
+        temp = st.slider("درجة الحرارة الميدانية (C°):", 10, 60, 35)
+        dust = st.slider("مستوى تراكم الغبار (%):", 0, 100, 20)
+        eff = max(0, 22.0 - (temp-25)*0.08 - dust*0.15)
+        st.metric("الكفاءة التشغيلية الفعالة", f"{eff:.2f}%")
+        
+    with col_chart:
+        # محاكاة مقارنة الأداء (Target vs Actual)
+        x = list(range(24))
+        target = [100 * np.sin(np.pi * i / 12) if 6 <= i <= 18 else 0 for i in x]
+        actual = [v * (eff/22) for v in target]
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=x, y=target, name="الإنتاج المستهدف", line=dict(dash='dash', color='gray')))
+        fig.add_trace(go.Scatter(x=x, y=actual, name="الإنتاج الفعلي (IIoT)", fill='tozeroy', line_color='#1e3a8a'))
+        fig.update_layout(title="مقارنة الأداء اللحظي للمحطة", height=300)
+        st.plotly_chart(fig, use_container_width=True)
 
+elif menu == "🛠️ الصيانة التنبؤية (AI)":
+    st.subheader("🛠️ تحليل الأصول المستند إلى الذكاء الاصطناعي")
+    
+    vib = st.slider("Vibration (mm/s RMS):", 0.0, 15.0, 3.2)
+    # خوارزمية Industry 4.0 للتنبؤ بالعمر المتبقي (RUL)
+    rul = max(0, 100 - (vib**2))
+    st.write(f"### العمر الافتراضي المتبقي للمعدة: **{rul:.1f} يوم**")
+    st.progress(rul/100)
+    
+    if st.button("📤 إرسال تقرير حالة الأصل"):
+        status = "آمن" if vib < 3 else "حرج"
+        msg = f"🛡️ {PLATFORM_NAME}\nالمعدة: P-101\nالاهتزاز: {vib}\nالعمر المتبقي: {rul:.1f} يوم\nالحالة: {status}"
+        requests.get(f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage?chat_id={CHAT_ID}&text={msg}")
+        st.success("تم إرسال البيانات للسيرفر المركزي")
 
-# حساب "العمر المتبقي" للمحمل (Bearing) بناءً على الاهتزاز
-vib_input = st.sidebar.slider("مستوى الاهتزاز الحالي (mm/s):", 0.0, 15.0, 4.2)
-remaining_life = max(0, 100 - (vib_input**2))
+elif menu == "🤖 وكيل الأتمتة والتوظيف":
+    st.subheader("🤖 وكيل الأتمتة الاستراتيجي (AI Agent)")
+    st.markdown("""
+    هذا الوكيل يعمل بتقنية Industry 4.0 لربط المهارات الهندسية بمتطلبات السوق:
+    - **أتمتة التقديم:** التقديم الذكي على الفرص التي تطابق بحثك العلمي (Bio-Gas).
+    - **تحليل الفجوة:** تنبيهك بالمهارات المطلوبة في مشاريع الهيدروجين والطاقة المتجددة غداً.
+    """)
+    if st.button("🚀 تفعيل الوكيل الذكي الآن"):
+        st.balloons()
+        st.info("تم تفعيل الروبوت، سيتم موافاتك بالنتائج عبر تليجرام.")
 
-c1, c2 = st.columns(2)
-c1.metric("العمر الافتراضي المتبقي للأصل", f"{remaining_life:.1f} يوم")
-c2.progress(remaining_life/100)
-
-if remaining_life < 30:
-    st.warning("⚠️ تم اكتشاف نمط اهتزاز غير طبيعي. الروبوت قام بجدولة أمر صيانة تلقائي.")
-
-# --- التواصل (الثوابت) ---
-st.sidebar.divider()
-st.sidebar.markdown(f"👤 **مطور النظام:** م. مجاهد بشير")
-st.sidebar.markdown(f"📞 `{MY_PHONE}`")
+st.sidebar.caption(f"تطوير م. مجاهد بشير © 2026 | {MY_PHONE}")
